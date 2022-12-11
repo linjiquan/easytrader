@@ -18,6 +18,7 @@ __pycache__/
 *.py[cod]
 account.json
 account.session
+accounts.yml
 # C extensions
 *.so
 

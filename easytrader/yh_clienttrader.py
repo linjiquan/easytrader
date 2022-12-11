@@ -52,9 +52,12 @@ class YHClientTrader(clienttrader.BaseLoginClientTrader):
             self._app.top_window().Edit1.type_keys(user)
             self._app.top_window().Edit2.type_keys(password)
             while True:
-                self._app.top_window().Edit3.type_keys(
-                    self._handle_verify_code(is_xiadan)
-                )
+                verify_control_edit = self._app.top_window().Edit3
+                if verify_control_edit.is_enabled():
+                    self._app.top_window().Edit3.type_keys(
+                        self._handle_verify_code(is_xiadan)
+                    )
+
                 if is_xiadan:
                     self._app.top_window().child_window(control_id=1006, class_name="Button").click()
                 else:
