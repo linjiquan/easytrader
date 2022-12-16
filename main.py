@@ -63,6 +63,39 @@ def exec_account(account):
         user.exit()
 
 
+
+def test_yh_client(file_path):
+    print('start to connect yh client...')
+    user = easytrader.use('yh_client')
+    user.prepare(file_path)
+
+    print(f'balance: {user.balance}')
+
+    print(f'today_entrusts: {user.today_entrusts}')
+    print(f'today_trades: {user.today_trades}')
+    print(f'cancel_entrusts: {user.cancel_entrusts}')
+
+    result = user.cancel_entrust("123456789")
+    print(f'cancel_invalid_entrusts: {result}')
+
+    try:
+        result = user.buy("511990", 1, 1e10)
+        print(f'invalid_buy: {result}')
+    except Exception as e:
+        print(e)
+
+    try:
+        result = user.sell("162411", 200, 1e10)
+        print(f'invalid_sell: {result}')
+    except Exception as e:
+        print(e)
+
+    try:
+        result = user.auto_ipo()
+        print(f'invalid_sell: {result}')
+    except Exception as e:
+        print(e)
+
 def main():
     try:
         accounts = load_accounts()
@@ -73,4 +106,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    test_yh_client('./yh_client.json')

@@ -49,6 +49,14 @@ class PopDialogHandler:
                 best_match="确定"
             ).click()
 
+    def _confirm_by_click(self):
+        try:
+            self._app.top_window()["是"].click()
+        except Exception as ex:
+            self._app.Window_(best_match="Dialog", top_level_only=True).ChildWindow(
+                best_match="是"
+            ).click()
+
     def _submit_by_shortcut(self):
         self._set_foreground(self._app.top_window())
         self._app.top_window().type_keys("%Y", set_foreground=False)
@@ -80,6 +88,10 @@ class TradePopDialogHandler(PopDialogHandler):
 
             if "正回购" in content:
                 self._submit_by_shortcut()
+                return None
+
+            if "提示信息" in content:
+                self._confirm_by_click()
                 return None
 
             return None

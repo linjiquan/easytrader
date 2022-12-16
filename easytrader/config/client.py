@@ -85,7 +85,7 @@ class CommonConfig:
 
 
 class YH(CommonConfig):
-    DEFAULT_EXE_PATH = r"C:\双子星金融终端独立交易-中国银河证券\xiadan.exe"
+    DEFAULT_EXE_PATH = r"C:\双子星新一代行情交易终端\transaction\xiadan.exe"
 
     TRADE_STOCK_EXCHANGE_TYPE_SZA = "深Ａ"
     TRADE_STOCK_EXCHANGE_TYPE_SHA = "沪Ａ"
@@ -104,7 +104,7 @@ class YH(CommonConfig):
         "发生日期": str,
     }
 
-    AUTO_IPO_MENU_PATH = ["新股申购", "一键打新"]
+    AUTO_IPO_MENU_PATH = ["申购", "沪深申购", "一键打新"]
 
 
 class HT(CommonConfig):
