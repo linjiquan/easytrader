@@ -51,6 +51,12 @@ class CommonConfig:
     TODAY_ENTRUSTS_MENU_PATH = ["查询[F4]", "当日委托"]
     TODAY_TRADES_MENU_PATH = ["查询[F4]", "当日成交"]
 
+    """条件单"""
+    COND_TRADE_ALL_MENU_PATH = ["智能交易", "条件下单", "我的条件单"]
+    COND_TRADE_BUY_MENU_PATH = ["智能交易", "条件下单", "定价买入"]
+    COND_TRADE_SELL_MENU_PATH = ["智能交易", "条件下单", "定价卖出"]
+    COND_TRADE_CANCEL_MENU_PATH = ["智能交易", "条件下单", "我的条件单"]
+
     BALANCE_CONTROL_ID_GROUP = {
         "资金余额": 1012,
         "可用金额": 1016,
@@ -91,6 +97,10 @@ class YH(CommonConfig):
     TRADE_STOCK_EXCHANGE_TYPE_SHA = "沪Ａ"
 
     BALANCE_GRID_CONTROL_ID = 1308
+    POSITION_GRID_CONTROL_ID = 1047
+
+    BALANCE_MENU_PATH = ["查询[F4]", "资金股份"]
+    POSITION_MENU_PATH = ["查询[F4]", "资金股份"]
 
     GRID_DTYPE = {
         "操作日期": str,

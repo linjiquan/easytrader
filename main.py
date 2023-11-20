@@ -7,8 +7,22 @@ trades = {
     'balance': lambda user: print(user.balance),
     'position': lambda user: print(user.position),
     'today_trades': lambda user: print(user.today_trades),
-    'buy': lambda user: print('action skipped'),
-    'sell': lambda user: print('action skipped'),
+    'refresh': lambda user: user.refresh(),
+    'auto_ipo': lambda user: print(user.auto_ipo()),
+    'cancel_entrust': lambda user: user.cancel_entrust('123456'),
+    'cancel_all_entrusts': lambda user: user.cancel_all_entrusts(),
+    'today_entrusts': lambda user: print(user.today_entrusts),
+    'buy': lambda user: user.buy(),
+    'sell': lambda user: user.sell(),
+    'all_cond_trades': lambda user: print(user.all_cond_trades),
+    'repo': lambda user: user.repo(),
+    'reverse_repo': lambda user: user.reverse_repo(),
+    'cond_trades': lambda user: print(user.cond_trades),
+    'conf_buy': lambda user: user.conf_buy('123456'),
+    'conf_sell': lambda user: user.conf_sell('123456'),
+    'cancel_conf_trade': lambda user: user.cancel_conf_trade('123456'),
+    'cancel_conf_trades': lambda user: user.cancel_conf_trades('123456'),
+    'unlock': lambda user: user.unlock,
 }
 
 
@@ -46,7 +60,7 @@ def exec_account(account):
         return
 
     try:
-        user = easytrader.use(account["name"])
+        user = easytrader.use(account["name"], debug=True)
 
         print('preparing account...')
         # user.prepare('./yh_client.json')
@@ -106,5 +120,5 @@ def main():
 
 
 if __name__ == "__main__":
-    # main()
-    test_yh_client('./yh_client.json')
+    main()
+    # test_yh_client('./yh_client.json')

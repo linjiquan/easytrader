@@ -66,11 +66,18 @@ class ClientTrader(IClientTrader):
     _grid_strategy_instance: IGridStrategy = None
     refresh_strategy: IRefreshStrategy = refresh_strategies.Switch()
 
+    _account = ''
+    _password = ''
+
     def enable_type_keys_for_editor(self):
         """
         有些客户端无法通过 set_edit_text 方法输入内容，可以通过使用 type_keys 方法绕过
         """
         self._editor_need_type_keys = True
+
+    def store_user_info(self, account, password):
+        self._account = account
+        self._password = password
 
     @property
     def grid_strategy_instance(self):
@@ -88,6 +95,9 @@ class ClientTrader(IClientTrader):
         self._app = None
         self._main = None
         self._toolbar = None
+
+        """对于不是自己打开的进程，没有所有权，不执行自动退出"""
+        self._owner_process = True
 
     @property
     def app(self):
@@ -160,6 +170,20 @@ class ClientTrader(IClientTrader):
         return self._get_grid_data(self._config.COMMON_GRID_CONTROL_ID)
 
     @property
+    def lock(self):
+        pass
+
+    @property
+    def unlock(self):
+        self._handle_lock_dialogs()
+
+    @property
+    def cond_trades(self):
+        self._switch_left_menus(self._config.COND_TRADE_ALL_MENU_PATH)
+
+        return self._get_grid_data(self._config.COMMON_GRID_CONTROL_ID)
+
+    @property
     def cancel_entrusts(self):
         self.refresh()
         self._switch_left_menus(["撤单[F3]"])
@@ -207,6 +231,32 @@ class ClientTrader(IClientTrader):
     @perf_clock
     def reverse_repo(self, security, price, amount, **kwargs):
         self._switch_left_menus(["债券回购", "融劵回购（逆回购）"])
+
+        return self.trade(security, price, amount)
+
+    @perf_clock
+    def cancel_conf_trade(self, trade_no):
+        self.refresh()
+        for i, entrust in enumerate(self.cond_trades):
+            if entrust[self._config.CANCEL_ENTRUST_ENTRUST_FIELD] == trade_no:
+                self._cancel_entrust_by_double_click(i)
+                return self._handle_pop_dialogs()
+        return {"message": "委托单状态错误不能撤单, 该委托单可能已经成交或者已撤"}
+
+    @perf_clock
+    def cancel_conf_trades(self):
+        pass
+
+    @perf_clock
+    def conf_buy(self, security, price, amount, **kwargs):
+        self._switch_left_menus(self._config.COND_TRADE_BUY_MENU_PATH)
+
+        return self.trade(security, price, amount)
+
+
+    @perf_clock
+    def conf_sell(self, security, price, amount, **kwargs):
+        self._switch_left_menus(self._config.COND_TRADE_SELL_MENU_PATH)
 
         return self.trade(security, price, amount)
 
@@ -394,7 +444,9 @@ class ClientTrader(IClientTrader):
         time.sleep(seconds)
 
     def exit(self):
-        self._app.kill()
+        """对于不是自己打开的进程，没有所有权，不执行自动退出"""
+        if self._owner_process is True:
+            self._app.kill()
 
     def _close_prompt_windows(self):
         self.wait(1)
@@ -564,6 +616,13 @@ class ClientTrader(IClientTrader):
         self.refresh_strategy.set_trader(self)
         self.refresh_strategy.refresh()
 
+
+    @perf_clock
+    def _handle_lock_dialogs(self):
+        if self.is_exist_pop_dialog() is False:
+            handler = pop_dialog_handler.LockPopDialogHandler(self._app)
+            handler.handle(self._password)
+
     @perf_clock
     def _handle_pop_dialogs(self, handler_class=pop_dialog_handler.PopDialogHandler):
         handler = handler_class(self._app)
@@ -579,6 +638,9 @@ class ClientTrader(IClientTrader):
                 return result
         return {"message": "success"}
 
+    @perf_clock
+    def _get_pop_dialog_text(self):
+        return self._app.top_window().Static.window_text()
 
 class BaseLoginClientTrader(ClientTrader):
     @abc.abstractmethod
@@ -617,4 +679,5 @@ class BaseLoginClientTrader(ClientTrader):
             comm_password,
             **kwargs
         )
+        self.store_user_info(user, password)
         self._init_toolbar()

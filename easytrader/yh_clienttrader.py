@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
+import logging
 import re
 import tempfile
 
 import pywinauto
 
-from easytrader import clienttrader, grid_strategies
+from easytrader import clienttrader,pop_dialog_handler,grid_strategies
 from easytrader.utils.captcha import recognize_verify_code
-
 
 class YHClientTrader(clienttrader.BaseLoginClientTrader):
     """
@@ -34,12 +34,26 @@ class YHClientTrader(clienttrader.BaseLoginClientTrader):
         :return:
         """
         try:
+            self.store_user_info(user, password)
+
             self._app = pywinauto.Application().connect(
                 path=self._run_exe_path(exe_path), timeout=1
             )
+
+            """
+            如果不是预期的窗口，需要关闭重来，以免状态不正确，操作定位不准确
+            """
+            self._close_prompt_windows()
+            self._app = pywinauto.Application().connect(
+                path=self._run_exe_path(exe_path), timeout=1
+            )
+            self._owner_process = False
+
+            logging.info('connected old process done.')
         # pylint: disable=broad-except
         except Exception:
             self._app = pywinauto.Application().start(exe_path)
+            logging.info('create new process done.')
             is_xiadan = True if "xiadan.exe" in exe_path else False
             # wait login window ready
             while True:
@@ -51,6 +65,7 @@ class YHClientTrader(clienttrader.BaseLoginClientTrader):
 
             self._app.top_window().Edit1.type_keys(user)
             self._app.top_window().Edit2.type_keys(password)
+
             while True:
                 verify_control_edit = self._app.top_window().Edit3
                 if verify_control_edit.is_enabled():
@@ -65,7 +80,7 @@ class YHClientTrader(clienttrader.BaseLoginClientTrader):
 
                 # detect login is success or not
                 try:
-                    self._app.top_window().wait_not("exists visible", 10)
+                    self._app.top_window().wait_not("exists visible", 5)
                     break
                 # pylint: disable=broad-except
                 except Exception:
@@ -106,13 +121,21 @@ class YHClientTrader(clienttrader.BaseLoginClientTrader):
             control.capture_as_image(rect).save(file_path, "jpeg")
         else:
             control.capture_as_image().save(file_path, "jpeg")
-        verify_code = recognize_verify_code(file_path, "yh_client")
+
+        # 修改为default识别,云上识别部署服务不可用
+        # verify_code = recognize_verify_code(file_path, "yh_client")
+        verify_code = recognize_verify_code(file_path, "default")
         return "".join(re.findall(r"\d+", verify_code))
 
     @property
     def balance(self):
         self._switch_left_menus(self._config.BALANCE_MENU_PATH)
         return self._get_grid_data(self._config.BALANCE_GRID_CONTROL_ID)
+
+    @property
+    def position(self):
+        self._switch_left_menus(self._config.POSITION_MENU_PATH)
+        return self._get_grid_data(self._config.POSITION_GRID_CONTROL_ID)
 
     def auto_ipo(self):
         self._switch_left_menus(self._config.AUTO_IPO_MENU_PATH)
