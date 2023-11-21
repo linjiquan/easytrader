@@ -104,7 +104,8 @@ class TradePopDialogHandler(PopDialogHandler):
             return None
 
         if title == "提示":
-            content = self._extract_content_edit()
+            # content = self._extract_content_edit()
+            content = self._extract_content()
             if "成功" in content:
                 entrust_no = self._extract_entrust_id(content)
                 self._submit_by_click()

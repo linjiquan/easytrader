@@ -5,18 +5,18 @@ import yaml
 
 trades = {
     'balance': lambda user: print(user.balance),
-    'position': lambda user: print(user.position),
+    'position': lambda user: print("holds: %d" % len(user.position)),
     'today_trades': lambda user: print(user.today_trades),
     'refresh': lambda user: user.refresh(),
     'auto_ipo': lambda user: print(user.auto_ipo()),
     'cancel_entrust': lambda user: user.cancel_entrust('123456'),
     'cancel_all_entrusts': lambda user: user.cancel_all_entrusts(),
     'today_entrusts': lambda user: print(user.today_entrusts),
-    'buy': lambda user: user.buy(),
-    'sell': lambda user: user.sell(),
+    'buy': lambda user: buy(user),
+    'sell': lambda user: print(user.sell('113578', 500, 10)),
     'all_cond_trades': lambda user: print(user.all_cond_trades),
-    'repo': lambda user: user.repo(),
-    'reverse_repo': lambda user: user.reverse_repo(),
+    'repo': lambda user: user.repo('sz000001', 1, 100),
+    'reverse_repo': lambda user: user.reverse_repo('sz000001', 1, 100),
     'cond_trades': lambda user: print(user.cond_trades),
     'conf_buy': lambda user: user.conf_buy('123456'),
     'conf_sell': lambda user: user.conf_sell('123456'),
@@ -24,6 +24,14 @@ trades = {
     'cancel_conf_trades': lambda user: user.cancel_conf_trades('123456'),
 }
 
+def buy(user):
+    try:
+        ret = user.buy('113578', 50, 50)
+        print(f'buy submitted: {ret}')
+        print('start to cancel entrust')
+        user.cancel_entrust(ret['entrust_no'])
+    except Exception as e:
+        print(f'buy failed: {e}')
 
 def load_accounts(filepath='./accounts.yml'):
     with open(filepath, 'r', encoding='utf-8') as f:

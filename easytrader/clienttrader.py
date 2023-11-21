@@ -534,7 +534,23 @@ class ClientTrader(IClientTrader):
             price_control.set_edit_text(limit_price)
 
     def _get_grid_data(self, control_id):
-        return self.grid_strategy_instance.get(control_id)
+        # return self.grid_strategy_instance.get(control_id)
+        count = 2
+        while True:
+            try:
+                if count <= 0:
+                    return []
+
+                data = self.grid_strategy_instance.get(control_id)
+                if data:
+                    return data
+
+            # pylint: disable=broad-except
+            except Exception as ex:
+                logger.debug("error occurred when trying to get grid data")
+
+            count = count - 1
+            self.wait(0.5)
 
     def _type_keys(self, control_id, text):
         self._main.child_window(control_id=control_id, class_name="Edit").set_edit_text(
