@@ -22,7 +22,6 @@ trades = {
     'conf_sell': lambda user: user.conf_sell('123456'),
     'cancel_conf_trade': lambda user: user.cancel_conf_trade('123456'),
     'cancel_conf_trades': lambda user: user.cancel_conf_trades('123456'),
-    'unlock': lambda user: user.unlock,
 }
 
 

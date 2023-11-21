@@ -115,38 +115,3 @@ class TradePopDialogHandler(PopDialogHandler):
             raise exceptions.TradeError(content)
         self._close()
         return None
-
-
-
-class LockPopDialogHandler(PopDialogHandler):
-    @perf_clock
-    def handle(self, title) -> Optional[dict]:
-        try:
-            pane = self._app.top_window().child_window(
-                class_name="#32770",
-                control_type="ControlType.Pane",
-            )
-            passwd_tips = pane.child_window(
-                control_id=1040,
-                class_name="Static",
-                window_text="请输入您的交易密码"
-            )
-
-            passwd_input = pane.child_window(
-                control_id=1039,
-                class_name="Edit",
-            )
-
-            passwd_confirm = pane.child_window(
-                control_id=1,
-                class_name="Button",
-                window_text="确定",
-            )
-
-            if passwd_tips and passwd_input and passwd_confirm:
-                # self._set_foreground(pane)
-                passwd_input.type_keys(self._password, set_foreground=False)
-                passwd_confirm.click()
-
-        except Exception as ex:
-            print(ex)

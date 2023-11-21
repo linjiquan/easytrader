@@ -170,14 +170,6 @@ class ClientTrader(IClientTrader):
         return self._get_grid_data(self._config.COMMON_GRID_CONTROL_ID)
 
     @property
-    def lock(self):
-        pass
-
-    @property
-    def unlock(self):
-        self._handle_lock_dialogs()
-
-    @property
     def cond_trades(self):
         self._switch_left_menus(self._config.COND_TRADE_ALL_MENU_PATH)
 
